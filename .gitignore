@@ -1,9 +1,15 @@
 *.o
 .DS_Store
 .*.swp
+.depend
+*.a
+/System.map
+/tools/mkimage
 /.config
 /.config.old
-/bin
+/.menuconfig.log
+/u-boot*
+/uboot.bin
 *.orig
 *.rej
 *~
