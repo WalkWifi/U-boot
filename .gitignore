@@ -1,0 +1,15 @@
+*.o
+.DS_Store
+.*.swp
+/.config
+/.config.old
+/bin
+*.orig
+*.rej
+*~
+.#*
+*#
+.emacs.desktop*
+TAGS*~
+git-src
+.p4cache/

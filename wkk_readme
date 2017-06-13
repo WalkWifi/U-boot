@@ -1,0 +1,51 @@
+------------- modify log ------------------
+project: uuwifi
+branch : uboot
+auther : weikaikai
+date   : 2015.10.21
+
+2015.10.19
+    uboot console 改为uart2
+    ---修改文件board/rt2880/serial.h
+        L20 #define CFG_RT2880_CONSOLE	RT2880_UART3
+    ---修改文件board/rt2880/serial.c
+        L185 修改：配置GPIO_MODE,将UART2_MODE打开。
+    ---修改文件drivers/rt2880_eth.c
+        L2142 #define CONFIG_ETH_ONE_PORT_ONLY ETH_ONE_PORT_ONLY
+        设置网口为单口模式。即只有一个wan口，因为lan口和uart2复用
+
+2015.10.20
+    uboot 使能power IO，使快速启动，添加使能GPIO#15为低电平亮绿灯。
+    ---修改文件drivers/rt2880_eth.c
+        L2150 添加gpio#11和GPIO#15的使能
+2016.3.14
+    uboot 修改bootdelay=2，修改选择启动项时敲击“空格键”等待延时20s。
+    ---修改文件include/configs/rt2880.h
+        L95 CONFIG_BOOTDELAY    2
+    ---修改文件board.c
+        L1972 添加获取键盘输入BootType ==空格时，timer1=20；不跳出循环，继续等待输入。
+
+2016.3.17
+    添加低压检测，检测到低压时，进入循环，电压达到阀值，继续启动。
+    ---在lib_mips/中添加文件drvlcd.c
+    ---在include/中添加文件drvlcd.h
+    ---修改lib_mips/Makefile：
+        添加“COBJS  = drvlcd.o board.o time.o mips_linux.o”中的drvlcd.o
+    ---修改lib_mips/board.c：
+        L1994:添加lcd_main();在选项3启动kernel前检测，防止函数出问题，其他选项不能使用。
+        L1427:添加isSoftRst，标记是reboot复位。
+
+2016.6.7
+    添加软重启检测，如果是软重启，不用检测按键，直接启动kernel。
+    ---修改lib_mips/board.c：
+        L1427 软重启标识置位
+    添加bootdelay的限制，如果是0则设成1，防止无法进入boot选项。
+    ---修改lib_mips/board.c：
+        L1965 if(timer1 == 0) timer1 = 1;
+    添加uart0使能，用来读写H330模块，采集电池电压
+    ---修改board/rt2880/serial.c
+        L327 uart0初始化，添加读写函数
+    ---修改include/serial.h
+        L24 三个外部调用函数，串口初始化、读、写。
+    处理函数在drvlcd.c中
+    编译OK。
